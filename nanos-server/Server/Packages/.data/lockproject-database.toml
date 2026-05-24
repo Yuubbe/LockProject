@@ -1,1 +1,1 @@
-players = { 76561198411031476 = { steam_id = "76561198411031476", first_seen = 1779654985, last_seen = 1779656360, money = 10, name = "Yuu", connection_count = 7 } }
+players = { 76561198411031476 = { last_seen = 1779657142, first_seen = 1779654985, money = 10, connection_count = 9, steam_id = "76561198411031476", name = "Yuu" } }
