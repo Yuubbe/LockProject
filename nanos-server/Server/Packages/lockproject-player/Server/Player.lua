@@ -21,6 +21,7 @@ Player.STARTING_MONEY = 0  -- pour l'instant, l'économie viendra plus tard
 
 -- Constructor
 -- @param nanos_player : l'entité Player de nanos (passée par Player.Subscribe)
+-- Constructor
 function Player.new(nanos_player)
     local self = setmetatable({}, Player)
 
@@ -34,6 +35,9 @@ function Player.new(nanos_player)
     self.first_seen       = nil
     self.last_seen        = nil
     self.is_new           = false
+
+    -- Runtime (pas persisté)
+    self.character = nil
 
     return self
 end
@@ -119,5 +123,47 @@ end
 function Player:IsCDF()
     return false  -- TODO : implémenter quand on aura lockproject-cdf
 end
+-- Spawn un Character pour ce joueur et le possède.
+-- Spawn point par défaut : origine de la map.
+function Player:SpawnCharacter(spawn_location)
+    if self.character then
+        Console.Warn("[Player] " .. self.name .. " has already a character. Skipping.")
+        return self.character
+    end
 
+    local location = spawn_location or Vector(0, 0, 200)  -- 200 d'altitude pour pas spawn sous la map
+    local rotation = Rotator(0, 0, 0)
+
+    -- Spawn un Character par défaut nanos
+    self.character = Character(location, rotation, "nanos-world::SK_Male")
+
+    -- Possède le character avec le joueur
+    self.nanos_player:Possess(self.character)
+
+    Console.Log("[Player] Character spawned for " .. self.name)
+    return self.character
+end
+
+-- Détruit le Character du joueur.
+function Player:DespawnCharacter()
+    if not self.character then return end
+    self.character:Destroy()
+    self.character = nil
+    Console.Log("[Player] Character despawned for " .. self.name)
+end
+
+-- Récupère le Character actuellement contrôlé (peut être nil).
+function Player:GetCharacter()
+    return self.character
+end
+
+-- Téléporte le character du joueur à une position donnée.
+function Player:TeleportTo(x, y, z)
+    if not self.character then
+        Console.Warn("[Player] Cannot teleport " .. self.name .. ": no character")
+        return false
+    end
+    self.character:SetLocation(Vector(x, y, z))
+    return true
+end
 return Player

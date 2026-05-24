@@ -11,6 +11,7 @@ _G.LockProject_Admin = Admin
 -- Charge les fichiers de commandes
 require("Commands/Test.lua")
 require("Commands/Money.lua")
+require("Commands/Teleport.lua")
 
 -- Hook : intercepter les messages de chat
 -- API confirmée par diagnostic : Chat.Subscribe("PlayerSubmit", function(text, sender))

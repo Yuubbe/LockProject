@@ -11,11 +11,13 @@ _G.LockProject_Player  = PlayerClass
 _G.LockProject_Players = PlayersRegistry
 
 -- Hook : à la connexion d'un joueur
--- NOTE : Player ici c'est la CLASSE NATIVE NANOS, pas notre classe
 Player.Subscribe("Spawn", function(nanos_player)
     local p = PlayerClass.new(nanos_player)
     p:LoadFromDatabase()
     PlayersRegistry:Add(p)
+
+    -- Spawn un Character pour qu'il ait un corps
+    p:SpawnCharacter()
 
     -- Message de bienvenue
     local msg
@@ -27,12 +29,13 @@ Player.Subscribe("Spawn", function(nanos_player)
     Chat.BroadcastMessage(msg)
 end)
 
--- Hook : à la déconnexion (au cas où on veut faire un dernier save)
+-- Hook : à la déconnexion
 Player.Subscribe("Destroy", function(nanos_player)
     local steam_id = nanos_player:GetSteamID()
     local p = PlayersRegistry:Get(steam_id)
     if p then
         p:Save()
+        p:DespawnCharacter()  -- nettoie le character
         PlayersRegistry:Remove(steam_id)
         Console.Log("[Player] " .. p:GetName() .. " déconnecté, sauvegardé.")
     end
